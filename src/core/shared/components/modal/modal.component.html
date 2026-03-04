@@ -1,0 +1,7 @@
+<div *ngIf="show" class="modal-backdrop d-flex justify-content-center align-items-center">
+  <div class="modal-dialog bg-dark text-white p-4 rounded shadow">
+    <h5>{{ title }}</h5>
+    <ng-content></ng-content>
+    <button class="btn btn-secondary mt-3 w-100" (click)="close.emit()">Fermer</button>
+  </div>
+</div>

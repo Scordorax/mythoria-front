@@ -1,0 +1,45 @@
+<div class="profile-container" *ngIf="!loading; else loader">
+
+  <div class="profile-card">
+    <div class="avatar">
+      {{ user.username.charAt(0) | uppercase }}
+    </div>
+
+    <h2>{{ user.username }}</h2>
+    <p>{{ user.email! | truncate:30 }}</p>
+
+    <div class="roles">
+      <span *ngFor="let role of user.roles" class="role-badge">
+        {{ role }}
+      </span>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+
+    <div class="stat-card">
+      <h3>{{ totalCards }}</h3>
+      <p>Cartes disponibles</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>{{ totalDecks }}</h3>
+      <p>Decks créés</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>{{ totalCollectionCards }}</h3>
+      <p>Cartes en collection</p>
+    </div>
+
+  </div>
+
+  <button class="logout-btn" (click)="logout()">
+    Déconnexion
+  </button>
+
+</div>
+
+<ng-template #loader>
+  <div class="loading">Chargement du profil...</div>
+</ng-template>

@@ -1,0 +1,57 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+  <div class="card p-4 shadow" style="width: 100%; max-width: 400px; border-radius: 0.5rem; background-color: #1f1f2e; color: #fff;">
+    <h2 class="text-center mb-4">Inscription</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="email" class="form-label text-white">Email</label>
+        <input type="email" id="email" class="form-control bg-dark text-white" formControlName="email" placeholder="votre email">
+        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger small mt-1">
+          Email invalide
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label for="username" class="form-label text-white">Nom d'utilisateur</label>
+        <input type="text" id="username" class="form-control bg-dark text-white" formControlName="username" placeholder="votre pseudo">
+        <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="text-danger small mt-1">
+          Nom requis
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="password" class="form-label text-white">Mot de passe</label>
+        <input type="password" id="password" class="form-control bg-dark text-white" formControlName="password" placeholder="mot de passe">
+        <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="text-danger small mt-1">
+          Mot de passe minimum 6 caractères
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label text-white">Confirmer le mot de passe</label>
+        <input type="password" id="confirmPassword" class="form-control bg-dark text-white" formControlName="confirmPassword" placeholder="confirmer mot de passe">
+        <div *ngIf="registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched" class="text-danger small mt-1">
+          Les mots de passe ne correspondent pas
+        </div>
+      </div>
+
+      <!-- Error / Success -->
+      <div *ngIf="errorMessage" class="alert alert-danger py-2">{{ errorMessage }}</div>
+      <div *ngIf="successMessage" class="alert alert-success py-2">{{ successMessage }}</div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+        {{ loading ? 'Inscription...' : 'S\'inscrire' }}
+      </button>
+    </form>
+
+    <p class="text-center mt-3">
+      Déjà un compte ? <a routerLink="/auth/login">Se connecter</a>
+    </p>
+  </div>
+</div>

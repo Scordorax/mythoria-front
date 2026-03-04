@@ -1,0 +1,3 @@
+<app-loader *ngIf="(isLoading$ | async) ?? false"></app-loader>
+<app-toast *ngIf="(showToast$ | async) ?? false" [message]="toastService.message"></app-toast>
+<router-outlet></router-outlet>

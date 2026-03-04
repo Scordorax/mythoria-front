@@ -1,0 +1,87 @@
+<div class="d-flex vh-100 bg-dark text-white">
+
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Main Content -->
+    <div class="flex-grow-1 d-flex flex-column">
+
+        <app-navbar></app-navbar>
+
+        <div class="container-fluid p-4">
+
+            <!-- Title -->
+            <div class="text-center mb-5">
+                <h1 class="fw-bold display-5">Mythoria</h1>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4">
+
+                <!-- Cartes -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card bg-secondary bg-opacity-25 border-0 shadow text-center p-4 h-100">
+                        <h6 class="text-uppercase text-secondary">Cartes disponibles</h6>
+                        <p class="display-4 fw-bold mb-0">{{ totalCards }}</p>
+                    </div>
+                </div>
+
+                <!-- Decks -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card bg-secondary bg-opacity-25 border-0 shadow text-center p-4 h-100">
+                        <h6 class="text-uppercase text-secondary">Mes Decks</h6>
+                        <p class="display-4 fw-bold mb-0">{{ totalDecks }}</p>
+                    </div>
+                </div>
+
+                <!-- Boosters -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card bg-secondary bg-opacity-25 border-0 shadow text-center p-4 h-100">
+                        <h6 class="text-uppercase text-secondary">Boosters</h6>
+                        <p class="display-4 fw-bold mb-0">{{ totalBoosters }}</p>
+                    </div>
+                </div>
+
+                <!-- Collection -->
+                <div class="col-12 col-md-6 col-xl-3">
+                    <div class="card bg-secondary bg-opacity-25 border-0 shadow text-center p-4 h-100">
+                        <h6 class="text-uppercase text-secondary">Cartes possédées</h6>
+                        <p class="display-4 fw-bold mb-0">{{ totalCollectionCards }}</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-5 text-center">
+
+                <div class="d-flex flex-wrap justify-content-center gap-3" style="margin-bottom: -28px; margin-top: -20px;">
+
+                    <a routerLink="/cards" class="btn btn-outline-light px-4">
+                        Voir les cartes
+                    </a>
+
+                    <a routerLink="/decks" class="btn btn-outline-light px-4">
+                        Voir mes decks
+                    </a>
+
+                    <a routerLink="/boosters" class="btn btn-outline-light px-4">
+                        Ouvrir un booster
+                    </a>
+
+                    <a routerLink="/collection" class="btn btn-outline-light px-4">
+                        Ma collection
+                    </a>
+
+                    <button class="btn btn-danger px-4" (click)="logout()">
+                        Déconnexion
+                    </button>
+
+                </div>
+                <app-booster-list></app-booster-list>
+            </div>
+
+        </div>
+
+    </div>
+</div>
