@@ -10,6 +10,7 @@ import { CardService } from '../../services/card.service';
 import { DeckService } from '../../services/deck.service';
 import { CollectionService } from '../../services/collection.service';
 import { UserModelService } from '../../services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -103,14 +104,22 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private cardService: CardService,
     private deckService: DeckService,
-    private collectionService: CollectionService
+    private collectionService: CollectionService,
+      private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadProfile();
+    const userId = this.authService.getUserId();
+
+    if (!userId) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    this.loadProfile(userId);
   }
 
-  private loadProfile(): void {
+  private loadProfile(userId: string): void {
     this.userService.getCurrentUser().subscribe(user => {
       this.user = user;
 
@@ -125,7 +134,7 @@ export class ProfileComponent implements OnInit {
       });
 
       // Nombre total de cartes possédées (avec quantité)
-      this.collectionService.getMyCollection().subscribe(collection => {
+      this.collectionService.getMyCollection(userId).subscribe(collection => {
         this.totalCollectionCards = collection.reduce(
           (total, item) => total + item.quantity,
           0

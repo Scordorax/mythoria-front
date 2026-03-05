@@ -10,6 +10,7 @@ import { CardService } from '../../services/card.service';
 import { CollectionService } from '../../services/collection.service';
 import { DeckService } from '../../services/deck.service';
 import { BoosterListComponent } from "../boosters/booster-list.component";
+import { UserModelService } from '../../services/user.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,20 +37,26 @@ export class DashboardComponent implements OnInit {
     private deckService: DeckService,
     private boosterService: BoosterService,
     private collectionService: CollectionService,
+    private userService: UserModelService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.loadDashboardStats();
+
+    const userId = this.authService.getUserId();
+
+    if (!userId) {
+      this.router.navigate(['/auth/login']);
+      return;
+    }
+
+    this.loadDashboardStats(userId);
+
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/auth/login']);
-  }
+  private loadDashboardStats(userId: string): void {
 
-  private loadDashboardStats(): void {
     this.cardService.getAll().subscribe(cards => {
       this.totalCards = cards.length;
       this.cdr.detectChanges();
@@ -65,13 +72,18 @@ export class DashboardComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
-    this.collectionService.getMyCollection().subscribe(collection => {
+    this.collectionService.getMyCollection(userId).subscribe(collection => {
       this.totalCollectionCards = collection.reduce(
         (total, item) => total + item.quantity,
         0
       );
       this.cdr.detectChanges();
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
   }
 
 }

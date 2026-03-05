@@ -9,19 +9,22 @@ import { UserModel } from '../models/user.model';
 })
 export class UserModelService {
 
-  private apiUrl = `${environment.apiUrl}/api/users`; // URL REST alignée
+  private apiUrl = `${environment.apiUrl}`; // URL REST alignée
 
   // State management utilisateur courant
   private currentUserSubject = new BehaviorSubject<UserModel | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /* =========================
      Récupérer l'utilisateur courant
   ========================== */
   getCurrentUser(): Observable<UserModel> {
-    return this.http.get<UserModel>(`${this.apiUrl}/me`).pipe(
+    const token = localStorage.getItem('jwt');
+    return this.http.get<UserModel>(`${this.apiUrl}/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
       tap(user => this.currentUserSubject.next(user))
     );
   }

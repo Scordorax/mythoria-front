@@ -12,15 +12,15 @@ export class BoosterService {
 
   private readonly baseUrl = `${environment.apiUrl}/boosters`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<BoosterModel[]> {
     return this.http.get<BoosterModel[]>(this.baseUrl);
   }
 
-  openBooster(id: number): Observable<{ message: string; cardsReceived: number }> {
-    return this.http.post<{ message: string; cardsReceived: number }>(
-      `${this.baseUrl}/open/${id}`,
+  openBooster(userId: string, boosterId: number) {
+    return this.http.post<{ message: string; userId: number; boosterId: number; cardsReceived: number }>(
+      `${this.baseUrl}/open/${userId}/${boosterId}`,
       {}
     );
   }

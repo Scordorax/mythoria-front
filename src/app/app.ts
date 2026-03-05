@@ -7,11 +7,13 @@ import { LoaderService } from '../core/services/loader.service';
 import { ToastService } from '../core/services/toast.service';
 import { LoaderComponent } from '../core/shared/components/loader/loader.component';
 import { ToastComponent } from '../core/shared/components/toast/toast.component';
+import { SidebarComponent } from "../core/shared/components/sidebar/sidebar.component";
+import { NavbarComponent } from "../core/shared/components/navbar/navbar.component";
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, LoaderComponent, ToastComponent],
+  imports: [CommonModule, RouterOutlet, LoaderComponent, ToastComponent, SidebarComponent, NavbarComponent],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })

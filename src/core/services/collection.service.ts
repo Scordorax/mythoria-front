@@ -12,10 +12,10 @@ export class CollectionService {
 
   private readonly baseUrl = `${environment.apiUrl}/collections`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  getMyCollection(): Observable<CollectionItemModel[]> {
-    return this.http.get<CollectionItemModel[]>(this.baseUrl);
+  getMyCollection(userId: string): Observable<CollectionItemModel[]> {
+    return this.http.get<CollectionItemModel[]>(`${this.baseUrl}/${userId}`);
   }
 
 }

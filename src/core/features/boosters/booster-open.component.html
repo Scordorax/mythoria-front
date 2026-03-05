@@ -1,0 +1,28 @@
+<!-- Modal Bootstrap 5 -->
+<div #boosterModal class="modal fade" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark text-white">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">Boosters "{{ selectedType }}"</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div 
+          class="booster-open-container d-flex flex-wrap justify-content-center"
+          (mousedown)="onMouseDown($event)"
+          (mousemove)="onMouseMove($event)"
+          (mouseup)="onMouseUp()"
+          (mouseleave)="onMouseUp()"
+        >
+          <div *ngFor="let booster of boostersOfType" class="booster-circle" (click)="openSingleBooster(booster)">
+            <div class="booster-3d" #boosterCanvas></div>
+            <p class="mt-2 text-center">{{ booster.name }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>

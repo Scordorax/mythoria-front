@@ -1,20 +1,23 @@
-<div class="booster-list-container mt-5">
-  <div class="booster-scroll d-flex">
+<div class="booster-list-container mt-5" style="margin-left: 250px;">
+  <div 
+    class="booster-scroll d-flex"
+    (mousedown)="onMouseDown($event)"
+    (mousemove)="onMouseMove($event)"
+    (mouseup)="onMouseUp()"
+    (mouseleave)="onMouseUp()"
+  >
     <div class="booster-card" *ngFor="let booster of boosters">
-      
-      <!-- Image du booster -->
-      <div class="booster-image">
-        <img src="assets/image/booster.png" [alt]="'Booster ' + booster.name">
-      </div>
-      
-      <!-- Nom et prix -->
+      <div class="booster-3d" #boosterCanvas></div>
       <h6 class="text-white mt-2">{{ booster.name }}</h6>
       <p class="text-white fw-bold">{{ booster.price }} €</p>
-      
-      <!-- Bouton ouvrir -->
-      <button class="btn btn-outline-light btn-sm mt-1 w-100" (click)="openBooster(booster)">
-        Ouvrir
+      <button 
+        class="btn btn-outline-light btn-sm mt-1 w-100"
+        (click)="openBoosterModal(booster)">
+        Voir / Ouvrir
       </button>
     </div>
   </div>
+
+  <!-- Composant enfant pour la modal -->
+  <app-booster-open></app-booster-open>
 </div>

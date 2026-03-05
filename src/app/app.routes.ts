@@ -3,6 +3,8 @@ import { LoginComponent } from '../core/features/auth/login.component';
 import { RegisterComponent } from '../core/features/auth/register.component';
 import { DashboardComponent } from '../core/features/dashboard/dashboard.component';
 import { authGuard } from '../core/guards/auth.guard';
+import { CollectionComponent } from '../core/features/collection/collection.component';
+import { CardsListComponent } from '../core/features/cards/card-list.component';
 
 export const routes: Routes = [
 
@@ -11,7 +13,8 @@ export const routes: Routes = [
 
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
 
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: '**', redirectTo: '/dashboard' },
+  { path: 'collection', component: CollectionComponent, canActivate: [authGuard] },
+
+  { path: 'cards', component: CardsListComponent, canActivate: [authGuard] },
 
 ];
