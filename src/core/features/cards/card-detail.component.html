@@ -1,0 +1,20 @@
+<div class="card-container" *ngIf="selectedCard">
+    <h2>{{ selectedCard.name }}</h2>
+
+    <div class="card-info text-center">
+        <p><strong>Type:</strong> {{ selectedCard.type }}</p>
+        <p><strong>HP:</strong> {{ selectedCard.hp }}</p>
+        <p><strong>Attack:</strong> {{ selectedCard.attack }}</p>
+        <p><strong>Defense:</strong> {{ selectedCard.defense }}</p>
+        <p><strong>Énergie:</strong> {{ selectedCard.energyCost }}</p>
+        <p>{{ selectedCard.description }}</p>
+
+        <button (click)="showBigPokemon = !showBigPokemon">
+            {{ showBigPokemon ? 'Cacher Pokémon' : 'Afficher Pokémon' }}
+        </button>
+    </div>
+
+    <div *ngIf="showBigPokemon" class="pokemon-modal">
+        <img src="assets/images/pikachu.gif" alt="{{selectedCard.name}}" class="pokemon-large">
+    </div>
+</div>

@@ -5,6 +5,7 @@ import { DashboardComponent } from '../core/features/dashboard/dashboard.compone
 import { authGuard } from '../core/guards/auth.guard';
 import { CollectionComponent } from '../core/features/collection/collection.component';
 import { CardsListComponent } from '../core/features/cards/card-list.component';
+import { ProfileComponent } from '../core/features/profile/profile.component';
 
 export const routes: Routes = [
 
@@ -16,5 +17,7 @@ export const routes: Routes = [
   { path: 'collection', component: CollectionComponent, canActivate: [authGuard] },
 
   { path: 'cards', component: CardsListComponent, canActivate: [authGuard] },
+
+  { path: 'profile', component: ProfileComponent, canActivate: [authGuard] }
 
 ];

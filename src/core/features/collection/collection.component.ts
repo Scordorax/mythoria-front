@@ -10,14 +10,13 @@ import { UserModelService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-
 @Component({
     selector: 'app-collection',
     standalone: true,
     imports: [CommonModule, FormsModule],
     templateUrl: './collection.component.html',
-    styles:
-        [`
+    styles: [
+        `
         .pokemon-card {
             background: linear-gradient(135deg, #1d68b3, #e9ecef); 
             border-radius: 15px;                                   
@@ -44,11 +43,11 @@ import { FormsModule } from '@angular/forms';
                 padding: 0.75rem;
 
                 .stats {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 0.5rem;
-                font-size: 0.85rem;
-                font-weight: 600;
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 0.5rem;
+                    font-size: 0.85rem;
+                    font-weight: 600;
                 }
             }
 
@@ -59,18 +58,19 @@ import { FormsModule } from '@angular/forms';
                 padding: 0.5rem;
 
                 .quantity {
-                font-size: 1rem;
+                    font-size: 1rem;
                 }
             }
-            }
-    
-        `]
+        }
+        `
+    ]
 })
 export class CollectionComponent implements OnInit {
 
     collection: CollectionItemModel[] = [];
-    loading!: boolean
+    loading!: boolean;
     userId!: string;
+
     totalCards = 0;
     totalDecks = 0;
     totalBoosters = 0;
@@ -89,18 +89,16 @@ export class CollectionComponent implements OnInit {
 
     ngOnInit(): void {
 
-
-
         this.userService.getCurrentUser().subscribe(user => {
             this.userId = user.sub;
-            this.loadDashboardStats(this.userId);
-            this.loadCollection(this.userId);
-        });
 
+            this.loadDashboardStats();
+            this.loadCollection();
+        });
 
     }
 
-    private loadDashboardStats(userId: string): void {
+    private loadDashboardStats(): void {
 
         this.cardService.getAll().subscribe(cards => {
             this.totalCards = cards.length;
@@ -117,13 +115,6 @@ export class CollectionComponent implements OnInit {
             this.cdr.detectChanges();
         });
 
-        this.collectionService.getMyCollection(userId).subscribe(collection => {
-            this.totalCollectionCards = collection.reduce(
-                (total, item) => total + item.quantity,
-                0
-            );
-            this.cdr.detectChanges();
-        });
     }
 
     logout(): void {
@@ -131,13 +122,23 @@ export class CollectionComponent implements OnInit {
         this.router.navigate(['/auth/login']);
     }
 
+    loadCollection(): void {
 
-    loadCollection(userId: string) {
         this.loading = true;
-        this.collectionService.getMyCollection(userId).subscribe({
+
+        this.collectionService.getMyCollection(this.userId).subscribe({
             next: (data) => {
+
                 this.collection = data;
+
+                // Calcul du total de cartes possédées
+                this.totalCollectionCards = data.reduce(
+                    (total, item) => total + item.quantity,
+                    0
+                );
+
                 this.loading = false;
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Erreur récupération collection', err);

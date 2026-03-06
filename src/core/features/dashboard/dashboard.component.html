@@ -68,8 +68,13 @@
             </button>
 
         </div>
-        <app-booster-list></app-booster-list>
+
+        <div *ngIf="loading" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status"></div>
+        </div>
+        <div *ngIf="!loading" class="container-fluid p-4">
+            <app-booster-list></app-booster-list>
+        </div>
     </div>
 
 </div>
-

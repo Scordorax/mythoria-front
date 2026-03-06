@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TruncatePipe, RarityPipe],
+  imports: [CommonModule, TruncatePipe],
   templateUrl: './profile.component.html',
   styles: [`
     .profile-container {

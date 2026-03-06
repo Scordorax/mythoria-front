@@ -1,8 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
-import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
+import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
 import { BoosterService } from '../../services/booster.service';
@@ -18,8 +17,6 @@ import { UserModelService } from '../../services/user.service';
   imports: [
     CommonModule,
     RouterModule,
-    SidebarComponent,
-    NavbarComponent,
     BoosterListComponent
   ],
   templateUrl: './dashboard.component.html',
@@ -30,6 +27,8 @@ export class DashboardComponent implements OnInit {
   totalDecks = 0;
   totalBoosters = 0;
   totalCollectionCards = 0;
+
+  loading = true;
 
   constructor(
     private authService: AuthService,
@@ -57,26 +56,26 @@ export class DashboardComponent implements OnInit {
 
   private loadDashboardStats(userId: string): void {
 
-    this.cardService.getAll().subscribe(cards => {
+    this.loading = true;
+
+    forkJoin({
+      cards: this.cardService.getAll(),
+      decks: this.deckService.getAll(),
+      boosters: this.boosterService.getAll(),
+      collection: this.collectionService.getMyCollection(userId)
+    }).subscribe(({ cards, decks, boosters, collection }) => {
+
       this.totalCards = cards.length;
-      this.cdr.detectChanges();
-    });
-
-    this.deckService.getAll().subscribe(decks => {
       this.totalDecks = decks.length;
-      this.cdr.detectChanges();
-    });
-
-    this.boosterService.getAll().subscribe(boosters => {
       this.totalBoosters = boosters.length;
-      this.cdr.detectChanges();
-    });
 
-    this.collectionService.getMyCollection(userId).subscribe(collection => {
       this.totalCollectionCards = collection.reduce(
         (total, item) => total + item.quantity,
         0
       );
+
+      this.loading = false;
+
       this.cdr.detectChanges();
     });
   }

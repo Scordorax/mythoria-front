@@ -59,6 +59,7 @@ export class SidebarComponent {
     { label: 'Cartes', link: '/cards', icon: 'bi bi-card-text' },
     { label: 'Decks', link: '/decks', icon: 'bi bi-stack' },
     { label: 'Boosters', link: '/dashboard', icon: 'bi bi-box' },
-    { label: 'Collection', link: '/collection', icon: 'bi bi-folder' }
+    { label: 'Collection', link: '/collection', icon: 'bi bi-folder' },
+    { label: 'Profile', link: '/profile', icon: 'bi bi-person-fill' }
   ];
 }

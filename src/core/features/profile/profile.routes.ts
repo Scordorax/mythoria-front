@@ -5,7 +5,7 @@ import { ProfileComponent } from './profile.component';
 
 export const PROFILE_ROUTES: Routes = [
   {
-    path: '',
+    path: 'profile',
     component: ProfileComponent,
     canActivate: [authGuard]
   }
