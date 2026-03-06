@@ -129,7 +129,7 @@ export class ProfileComponent implements OnInit {
       });
 
       // Nombre total de decks
-      this.deckService.getAll().subscribe(decks => {
+      this.deckService.getByUser(userId).subscribe(decks => {
         this.totalDecks = decks.length;
       });
 

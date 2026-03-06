@@ -1,6 +1,5 @@
 <div class="container mt-4">
-
-    <h2 class="mb-4 text-center">Création de Deck</h2>
+    <h2 class="mb-4 text-center">Modification du Deck</h2>
 
     <!-- Nom du deck -->
     <div class="mb-4">
@@ -8,25 +7,7 @@
         <input type="text" id="deckName" class="form-control" [(ngModel)]="deckName" placeholder="Nom du deck">
     </div>
 
-    <!-- Choix des types -->
-    <div class="mb-4">
-        <label class="form-label">Choisir 1 ou 2 types maximum</label>
-        <div class="d-flex flex-wrap gap-2">
-            <button *ngFor="let type of availableTypes" class="btn"
-                [ngClass]="selectedTypes.includes(type) ? 'btn-primary' : 'btn-outline-primary'"
-                (click)="toggleType(type)">
-                {{ type }}
-            </button>
-        </div>
-    </div>
-
-    <!-- Message si aucun type sélectionné -->
-    <div *ngIf="selectedTypes.length === 0" class="alert alert-info">
-        Choisissez un ou deux types pour afficher les cartes disponibles.
-    </div>
-
     <div class="row">
-
         <!-- Cartes disponibles -->
         <div class="col-md-6">
             <h4 class="mb-3">Collection disponible</h4>
@@ -54,13 +35,11 @@
                 </li>
             </ul>
         </div>
-
     </div>
 
     <!-- Boutons -->
     <div class="mt-4 text-center">
-        <button class="btn btn-success" (click)="saveDeck()">Enregistrer le deck</button>
+        <button class="btn btn-success" (click)="saveDeck()">Enregistrer les modifications</button>
         <button class="btn btn-secondary ms-2" (click)="cancel()">Annuler</button>
     </div>
-
 </div>

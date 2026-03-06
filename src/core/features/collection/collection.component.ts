@@ -105,7 +105,7 @@ export class CollectionComponent implements OnInit {
             this.cdr.detectChanges();
         });
 
-        this.deckService.getAll().subscribe(decks => {
+        this.deckService.getByUser(this.userId).subscribe(decks => {
             this.totalDecks = decks.length;
             this.cdr.detectChanges();
         });

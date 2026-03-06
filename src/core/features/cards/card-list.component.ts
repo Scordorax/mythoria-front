@@ -131,7 +131,7 @@ export class CardsListComponent implements OnInit {
   }
 
   private loadDashboardStats(): void {
-    this.deckService.getAll().subscribe(decks => {
+    this.deckService.getByUser(this.userId).subscribe(decks => {
       this.totalDecks = decks.length;
       this.cdr.detectChanges();
     });

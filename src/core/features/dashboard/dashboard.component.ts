@@ -60,7 +60,7 @@ export class DashboardComponent implements OnInit {
 
     forkJoin({
       cards: this.cardService.getAll(),
-      decks: this.deckService.getAll(),
+      decks: this.deckService.getByUser(userId),
       boosters: this.boosterService.getAll(),
       collection: this.collectionService.getMyCollection(userId)
     }).subscribe(({ cards, decks, boosters, collection }) => {
