@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 
 import { Observable } from 'rxjs';
 import { LoaderService } from '../core/services/loader.service';
@@ -23,10 +23,14 @@ export class App {
 
   constructor(
     private loaderService: LoaderService,
-    public toastService: ToastService
+    public toastService: ToastService,
+    public router: Router
   ) {
     // 🔹 Assure-toi que les observables existent
-    this.isLoading$ = this.loaderService.isLoading$; 
+    this.isLoading$ = this.loaderService.isLoading$;
     this.showToast$ = this.toastService.show$;
+  }
+  hideLayout(): boolean {
+    return this.router.url.startsWith('/auth');
   }
 }
