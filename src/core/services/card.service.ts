@@ -12,7 +12,7 @@ export class CardService {
 
   private readonly baseUrl = `${environment.apiUrl}/cards`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAll(): Observable<CardModel[]> {
     return this.http.get<any[]>(this.baseUrl).pipe(
@@ -24,5 +24,9 @@ export class CardService {
     return this.http.get<any>(`${this.baseUrl}/${id}`).pipe(
       map(data => CardFactory.create(data))
     );
+  }
+
+  createCard(card: CardModel, boosterId: any) {
+    return this.http.post(this.baseUrl + '/create/' + boosterId, card);
   }
 }

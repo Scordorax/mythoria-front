@@ -1,0 +1,31 @@
+<div class="container">
+      <h2>Factory Pokémon</h2>
+
+  <!-- Choix du nombre -->
+  <input
+    type="number"
+    [(ngModel)]="quantity"
+    min="1"
+    max="255"
+  />
+
+  <button (click)="createCards()">
+    Générer {{ quantity }} cartes
+  </button>
+</div>
+
+<div class="container">
+  <!-- Affichage des cartes -->
+  <div *ngFor="let card of createdCards" class="card-preview">
+
+    <h3>{{ card.name }}</h3>
+    <p>Type: {{ card.type }}</p>
+    <p>Rareté: {{ card.rarity }}</p>
+    <p>ATK: {{ card.attack }}</p>
+    <p>DEF: {{ card.defense }}</p>
+    <p>HP: {{ card.hp }}</p>
+    
+
+  </div>
+
+</div>

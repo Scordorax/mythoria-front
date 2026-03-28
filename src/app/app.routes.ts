@@ -10,6 +10,7 @@ import { DeckListComponent } from '../core/features/decks/deck-list.component';
 import { DeckBuilderComponent } from '../core/features/decks/deck-builder.component';
 import { DeckDetailComponent } from '../core/features/decks/deck-detail.component';
 import { DeckModifyComponent } from '../core/features/decks/deck-modify.component';
+import { CardFactoryComponent } from '../core/features/cards/card-factory.component';
 
 export const routes: Routes = [
 
@@ -23,6 +24,8 @@ export const routes: Routes = [
   { path: 'cards', component: CardsListComponent, canActivate: [authGuard] },
 
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
+
+  { path: 'cards/factory', component: CardFactoryComponent, canActivate: [authGuard] },
 
   // Routes Deck
   {
