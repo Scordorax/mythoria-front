@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { UserModel } from '../../models/user.model';
@@ -11,6 +11,7 @@ import { DeckService } from '../../services/deck.service';
 import { CollectionService } from '../../services/collection.service';
 import { UserModelService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -105,8 +106,9 @@ export class ProfileComponent implements OnInit {
     private cardService: CardService,
     private deckService: DeckService,
     private collectionService: CollectionService,
-      private router: Router
-  ) {}
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     const userId = this.authService.getUserId();
@@ -120,28 +122,39 @@ export class ProfileComponent implements OnInit {
   }
 
   private loadProfile(userId: string): void {
+
     this.userService.getCurrentUser().subscribe(user => {
       this.user = user;
 
-      // Nombre total de cartes existantes
-      this.cardService.getAll().subscribe(cards => {
-        this.totalCards = cards.length;
+      forkJoin({
+        cards: this.cardService.getAll(),
+        decks: this.deckService.getByUser(userId),
+        collection: this.collectionService.getMyCollection(userId)
+      }).subscribe({
+        next: (result) => {
+
+          this.totalCards = result.cards.length;
+          this.totalDecks = result.decks.length;
+
+          this.totalCollectionCards = result.collection.reduce(
+            (total, item) => total + item.quantity,
+            0
+          );
+
+          this.loading = false;
+
+          // 🔥 FORCE UPDATE COMME TON AUTRE COMPOSANT
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Erreur chargement profil', err);
+          this.loading = false;
+
+          // 🔥 aussi ici
+          this.cdr.detectChanges();
+        }
       });
 
-      // Nombre total de decks
-      this.deckService.getByUser(userId).subscribe(decks => {
-        this.totalDecks = decks.length;
-      });
-
-      // Nombre total de cartes possédées (avec quantité)
-      this.collectionService.getMyCollection(userId).subscribe(collection => {
-        this.totalCollectionCards = collection.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-
-        this.loading = false;
-      });
     });
   }
 
