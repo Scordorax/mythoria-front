@@ -1,45 +1,62 @@
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">Modification du Deck</h2>
+<div class="container mt-3">
 
-    <!-- Nom du deck -->
-    <div class="mb-4">
-        <label for="deckName" class="form-label">Nom du deck</label>
-        <input type="text" id="deckName" class="form-control" [(ngModel)]="deckName" placeholder="Nom du deck">
-    </div>
+    <app-loader *ngIf="loading"></app-loader>
 
-    <div class="row">
-        <!-- Cartes disponibles -->
-        <div class="col-md-6">
-            <h4 class="mb-3">Collection disponible</h4>
-            <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center"
-                    *ngFor="let card of filteredCards">
-                    <span>{{ card.cardName }} ({{ card.quantity }})</span>
-                    <button class="btn btn-sm btn-primary" (click)="addCardToDeck(card)">
-                        Ajouter
-                    </button>
-                </li>
-            </ul>
+    <div *ngIf="!loading">
+
+        <h2>Modifier le deck</h2>
+
+        <!-- Nom du deck -->
+        <div class="mb-3">
+            <input [(ngModel)]="deckName" class="form-control" placeholder="Nom du deck">
         </div>
 
-        <!-- Cartes dans le deck -->
-        <div class="col-md-6">
-            <h4 class="mb-3">Cartes dans le deck</h4>
-            <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center"
-                    *ngFor="let c of deckCards">
-                    <span>{{ c.card.cardName }} x{{ c.quantity }}</span>
-                    <button class="btn btn-sm btn-danger" (click)="removeCardFromDeck(c.card.cardId)">
-                        Supprimer
-                    </button>
-                </li>
-            </ul>
-        </div>
-    </div>
+        <div class="row">
 
-    <!-- Boutons -->
-    <div class="mt-4 text-center">
-        <button class="btn btn-success" (click)="saveDeck()">Enregistrer les modifications</button>
-        <button class="btn btn-secondary ms-2" (click)="cancel()">Annuler</button>
+            <!-- COLLECTION -->
+            <div class="col-md-6">
+                <h4 class="mb-3">Collection disponible</h4>
+
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        *ngFor="let card of allCards">
+
+                        <span>{{ card.cardName }} ({{ card.quantity }})</span>
+
+                        <button class="btn btn-sm btn-primary" (click)="addCardToDeck(card)"
+                            [disabled]="isMaxReached(card)">
+                            Ajouter
+                        </button>
+
+                    </li>
+                </ul>
+            </div>
+
+            <!-- DECK -->
+            <div class="col-md-6">
+                <h4 class="mb-3">Cartes dans le deck</h4>
+
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"
+                        *ngFor="let c of deckCards">
+
+                        <span>{{ c.card.cardName }} x{{ c.quantity }}</span>
+
+                        <button class="btn btn-sm btn-danger" (click)="decrease(c.card.cardId)">
+                            Supprimer
+                        </button>
+
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="mt-3 text-end">
+            <button class="btn btn-success me-2" (click)="saveDeck()">Enregistrer modification</button>
+            <button class="btn btn-secondary" (click)="cancel()">Annuler modification</button>
+        </div>
+
     </div>
 </div>

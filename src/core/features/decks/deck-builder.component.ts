@@ -35,12 +35,15 @@ h4 {
 export class DeckBuilderComponent implements OnInit {
 
     allCards: CollectionItemModel[] = [];
+    filteredCards: CollectionItemModel[] = [];
+
     deckName: string = '';
     deckCards: { card: CollectionItemModel, quantity: number }[] = [];
+
     userId: string = '';
+
     selectedTypes: string[] = [];
     availableTypes: string[] = [];
-    filteredCards: CollectionItemModel[] = [];
 
     constructor(
         private collectionService: CollectionService,
@@ -61,8 +64,12 @@ export class DeckBuilderComponent implements OnInit {
     loadCollection(): void {
         this.collectionService.getMyCollection(this.userId).subscribe(cards => {
             this.allCards = cards;
+
             const types = new Set(cards.map(c => c.type));
             this.availableTypes = Array.from(types);
+
+            // IMPORTANT → affichage initial
+            this.filterCards();
         });
     }
 
@@ -76,6 +83,7 @@ export class DeckBuilderComponent implements OnInit {
             }
             this.selectedTypes.push(type);
         }
+
         this.filterCards();
     }
 
@@ -84,6 +92,7 @@ export class DeckBuilderComponent implements OnInit {
             this.filteredCards = [];
             return;
         }
+
         this.filteredCards = this.allCards.filter(card =>
             this.selectedTypes.includes(card.type)
         );
@@ -91,10 +100,12 @@ export class DeckBuilderComponent implements OnInit {
 
     addCardToDeck(card: CollectionItemModel): void {
         if (this.selectedTypes.length === 0) {
-            alert("Choisissez au moins un type avant d'ajouter des cartes.");
+            alert("Choisissez au moins un type.");
             return;
         }
+
         const existing = this.deckCards.find(c => c.card.cardId === card.cardId);
+
         if (existing) {
             existing.quantity++;
         } else {
@@ -102,6 +113,20 @@ export class DeckBuilderComponent implements OnInit {
         }
     }
 
+    // ✅ supprimer UNE seule carte
+    removeOneCardFromDeck(cardId: number): void {
+        const index = this.deckCards.findIndex(c => c.card.cardId === cardId);
+
+        if (index !== -1) {
+            if (this.deckCards[index].quantity > 1) {
+                this.deckCards[index].quantity--;
+            } else {
+                this.deckCards.splice(index, 1);
+            }
+        }
+    }
+
+    // ❌ supprimer totalement
     removeCardFromDeck(cardId: number): void {
         this.deckCards = this.deckCards.filter(c => c.card.cardId !== cardId);
     }
@@ -109,9 +134,13 @@ export class DeckBuilderComponent implements OnInit {
     saveDeck(): void {
         const payload: CreateDeckRequest & { userId: string } = {
             name: this.deckName,
-            cards: this.deckCards.map(c => ({ id: c.card.cardId, quantity: c.quantity })),
+            cards: this.deckCards.map(c => ({
+                id: c.card.cardId,
+                quantity: c.quantity
+            })),
             userId: this.userId
         };
+
         this.deckService.create(payload).subscribe({
             next: () => {
                 alert('Deck créé avec succès !');

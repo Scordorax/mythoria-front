@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { DeckService } from '../../services/deck.service';
 import { CollectionService } from '../../services/collection.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -7,11 +7,12 @@ import { CreateDeckRequest } from '../../models/created-deck-request.model';
 import { UserModelService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoaderComponent } from "../../shared/components/loader/loader.component";
 
 @Component({
     selector: 'app-deck-modify',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, LoaderComponent],
     templateUrl: './deck-modify.component.html',
     styles: [`
         ul.list-group li {
@@ -29,50 +30,39 @@ import { FormsModule } from '@angular/forms';
 })
 export class DeckModifyComponent implements OnInit {
 
-    userId: string = '';
+    userId!: string;
     deckId!: number;
+
     deckName: string = '';
     deckCards: { card: CollectionItemModel, quantity: number }[] = [];
 
     allCards: CollectionItemModel[] = [];
-    filteredCards: CollectionItemModel[] = [];
+    loading: boolean = true;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private deckService: DeckService,
         private collectionService: CollectionService,
-        private userService: UserModelService
+        private cdr: ChangeDetectorRef
     ) { }
 
     ngOnInit(): void {
-        this.userService.getCurrentUser().subscribe(user => {
-            if (user) {
-                this.userId = user.sub;
-                this.loadCollection();
+        this.userId = this.route.snapshot.paramMap.get('userId')!;
+        this.deckId = Number(this.route.snapshot.paramMap.get('deckId'));
 
-                this.route.params.subscribe(params => {
-                    if (params['id']) {
-                        this.deckId = +params['id'];
-                        this.loadDeck(this.deckId);
-                    }
-                });
-            }
-        });
+        this.loadDeck();
     }
 
-    loadCollection(): void {
-        this.collectionService.getMyCollection(this.userId).subscribe(cards => {
-            this.allCards = cards;
-            this.updateFilteredCards();
-        });
-    }
+    loadDeck(): void {
+        this.loading = true;
 
-    loadDeck(deckId: number): void {
-        this.deckService.getById(deckId).subscribe({
-            next: deck => {
+        this.deckService.getDeckDetail(this.userId, this.deckId).subscribe({
+            next: (deck) => {
+
                 this.deckName = deck.name;
-                this.deckCards = deck.cards.map(c => ({
+
+                this.deckCards = (deck.cards || []).map((c: any) => ({
                     card: {
                         collectionId: 0,
                         cardId: c.cardId,
@@ -88,46 +78,89 @@ export class DeckModifyComponent implements OnInit {
                     },
                     quantity: c.quantity
                 }));
-                this.updateFilteredCards();
+
+                this.loadCollection();
+
+                this.loading = false;
+                this.cdr.detectChanges();
             },
-            error: err => console.error('Erreur chargement deck', err)
+            error: (err) => {
+                console.error(err);
+                this.loading = false;
+                this.cdr.detectChanges();
+            }
         });
     }
 
-    updateFilteredCards(): void {
-        // Retirer les cartes déjà dans le deck pour éviter doublons
-        const deckIds = this.deckCards.map(c => c.card.cardId);
-        this.filteredCards = this.allCards.filter(c => !deckIds.includes(c.cardId));
+    loadCollection(): void {
+        this.collectionService.getMyCollection(this.userId).subscribe({
+            next: (cards) => {
+                this.allCards = cards;
+                this.cdr.detectChanges(); // 🔥 IMPORTANT
+            },
+            error: (err) => console.error(err)
+        });
     }
 
     addCardToDeck(card: CollectionItemModel): void {
         const existing = this.deckCards.find(c => c.card.cardId === card.cardId);
+
         if (existing) {
-            existing.quantity++;
+            if (existing.quantity < card.quantity) {
+                existing.quantity++;
+            } else {
+                alert('Limite atteinte pour cette carte');
+            }
         } else {
             this.deckCards.push({ card, quantity: 1 });
         }
-        this.updateFilteredCards();
     }
 
-    removeCardFromDeck(cardId: number): void {
+    removeCard(cardId: number): void {
         this.deckCards = this.deckCards.filter(c => c.card.cardId !== cardId);
-        this.updateFilteredCards();
+    }
+
+    increase(cardId: number): void {
+        const deckCard = this.deckCards.find(c => c.card.cardId === cardId);
+        const collectionCard = this.allCards.find(c => c.cardId === cardId);
+
+        if (deckCard && collectionCard && deckCard.quantity < collectionCard.quantity) {
+            deckCard.quantity++;
+        }
+    }
+
+    decrease(cardId: number): void {
+        const deckCard = this.deckCards.find(c => c.card.cardId === cardId);
+
+        if (deckCard) {
+            deckCard.quantity--;
+
+            if (deckCard.quantity <= 0) {
+                this.removeCard(cardId);
+            }
+        }
+    }
+
+    isMaxReached(card: CollectionItemModel): boolean {
+        const deckCard = this.deckCards.find(c => c.card.cardId === card.cardId);
+        return deckCard ? deckCard.quantity >= card.quantity : false;
     }
 
     saveDeck(): void {
-        const payload: CreateDeckRequest & { userId: string } = {
+        const payload: CreateDeckRequest = {
             name: this.deckName,
-            cards: this.deckCards.map(c => ({ id: c.card.cardId, quantity: c.quantity })),
-            userId: this.userId
+            cards: this.deckCards.map(c => ({
+                id: c.card.cardId,
+                quantity: c.quantity
+            }))
         };
 
-        this.deckService.update(this.deckId, payload).subscribe({
+        this.deckService.update(this.userId, this.deckId, payload).subscribe({
             next: () => {
-                alert('Deck modifié avec succès !');
+                alert('Deck sauvegardé !');
                 this.router.navigate(['/decks']);
             },
-            error: err => console.error('Erreur modification deck', err)
+            error: err => console.error(err)
         });
     }
 

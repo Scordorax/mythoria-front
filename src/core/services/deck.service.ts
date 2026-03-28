@@ -33,8 +33,8 @@ export class DeckService {
   }
 
   // Modifier un deck existant
-  update(id: number, data: CreateDeckRequest): Observable<{ message: string; deckId: number }> {
-    return this.http.put<{ message: string; deckId: number }>(`${this.baseUrl}/${id}`, data);
+  update(userId: string, id: number, data: CreateDeckRequest) {
+    return this.http.put(`${this.baseUrl}/${userId}/${id}`, data);
   }
 
   // Récupérer un deck par son ID

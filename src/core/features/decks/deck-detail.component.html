@@ -1,25 +1,33 @@
 <div class="container mt-4">
-  <h2 class="text-center mb-4">Détails du deck : {{ deck?.name || 'Chargement...' }}</h2>
+  <h2 class="text-center mb-4">
+    Détails du deck : {{ deck?.name || 'Chargement...' }}
+  </h2>
 
   <!-- Spinner de chargement -->
   <div *ngIf="loading" class="text-center my-5">
-    <div class="spinner-border text-primary" role="status"></div>
+    <app-loader></app-loader>
   </div>
 
   <!-- Cartes du deck -->
-  <div class="row g-3" *ngIf="!loading && deck?.cards?.length > 0">
-    <div class="col-sm-6 col-md-4 col-lg-3" *ngFor="let card of deck.cards">
+  <div class="row g-3" *ngIf="!loading">
+    <div
+      class="col-sm-6 col-md-4 col-lg-3"
+      *ngFor="let card of deck?.cards"
+    >
       <div class="pokemon-card">
         <!-- En-tête -->
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0 text-truncate">{{ card.name }}</h5>
-          <span class="badge" [ngClass]="getRarityClass(card.rarity)">{{ card.rarity }}</span>
+          <span class="badge" [ngClass]="getRarityClass(card.rarity)">
+            {{ card.rarity }}
+          </span>
         </div>
 
-        <!-- Corps de la carte -->
+        <!-- Corps -->
         <div class="card-body text-center">
           <p><strong>Type:</strong> {{ card.type }}</p>
           <p>{{ card.description || 'Pas de description' }}</p>
+
           <div class="stats d-flex justify-content-between mt-2 flex-wrap">
             <span>HP: {{ card.hp }}</span>
             <span>Atk: {{ card.attack }}</span>
@@ -28,7 +36,7 @@
           </div>
         </div>
 
-        <!-- Pied de carte -->
+        <!-- Footer -->
         <div class="card-footer text-center">
           <span class="quantity">x{{ card.quantity }}</span>
         </div>

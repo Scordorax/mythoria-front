@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DeckService } from '../../services/deck.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { LoaderComponent } from "../../shared/components/loader/loader.component";
 
 @Component({
-    selector: 'app-deck-detail',
-    standalone: true,
-    imports: [CommonModule, FormsModule],
-    templateUrl: './deck-detail.component.html',
-    styles: [`.pokemon-card {
+  selector: 'app-deck-detail',
+  standalone: true,
+  imports: [CommonModule, FormsModule, LoaderComponent],
+  templateUrl: './deck-detail.component.html',
+  styles: [`.pokemon-card {
   background: linear-gradient(135deg, #1d68b3, #e9ecef);
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -92,55 +93,64 @@ import { FormsModule } from '@angular/forms';
 })
 export class DeckDetailComponent implements OnInit {
 
-    userId!: string;
-    deckId!: number;
-    deck: any = { cards: [] };
-    loading !: boolean
+  userId!: string;
+  deckId!: number;
 
-    constructor(
-        private route: ActivatedRoute,
-        private deckService: DeckService
-    ) { }
+  deck: any = { cards: [] };
+  loading: boolean = true;
 
-    ngOnInit(): void {
-        this.userId = this.route.snapshot.paramMap.get('userId')!;
-        this.deckId = Number(this.route.snapshot.paramMap.get('deckId'));
-        this.loadDeck();
+  constructor(
+    private route: ActivatedRoute,
+    private deckService: DeckService,
+    private cdr: ChangeDetectorRef
+  ) { }
+
+  ngOnInit(): void {
+    this.userId = this.route.snapshot.paramMap.get('userId')!;
+    this.deckId = Number(this.route.snapshot.paramMap.get('deckId'));
+    this.loadDeck();
+  }
+
+  loadDeck(): void {
+    this.loading = true;
+
+    this.deckService.getDeckDetail(this.userId, this.deckId).subscribe({
+      next: (deck) => {
+        console.log('DATA RECUE:', deck);
+
+        this.deck = {
+          deckId: deck.deckId,
+          name: deck.name,
+          cards: (deck.cards || []).map((c: any) => ({
+            ...c,
+            rarity: (c.rarity || 'Commun').trim()
+          }))
+        };
+
+        this.loading = false;
+
+        // 🔥 Force Angular à refresh (au cas où)
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur chargement deck', err);
+        this.deck = { cards: [] };
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getRarityClass(rarity: string): string {
+    const r = (rarity || 'commun').toLowerCase().trim();
+
+    switch (r) {
+      case 'commun': return 'common';
+      case 'uncommon': return 'uncommon';
+      case 'rare': return 'rare';
+      case 'epic': return 'epic';
+      case 'legendary': return 'legendary';
+      default: return 'common';
     }
-
-    loadDeck(): void {
-        this.loading = true;
-        this.deckService.getDeckDetail(this.userId, this.deckId).subscribe({
-            next: (deck) => {
-                // ⚡ Normaliser deck et cartes
-                this.deck = {
-                    deckId: deck.deckId,
-                    name: deck.name,
-                    cards: deck.cards.map((c: any) => ({
-                        ...c,
-                        rarity: (c.rarity || 'Commun').trim()
-                    }))
-                };
-                this.loading = false;
-                console.log('Deck chargé :', this.deck);
-            },
-            error: (err) => {
-                console.error('Erreur chargement deck', err);
-                this.deck = { cards: [] };
-                this.loading = false;
-            }
-        });
-    }
-
-    getRarityClass(rarity: string): string {
-        const r = (rarity || 'commun').toLowerCase().trim();
-        switch (r) {
-            case 'commun': return 'common';
-            case 'uncommon': return 'uncommon';
-            case 'rare': return 'rare';
-            case 'epic': return 'epic';
-            case 'legendary': return 'legendary';
-            default: return 'common';
-        }
-    }
+  }
 }
