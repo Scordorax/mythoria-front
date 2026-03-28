@@ -70,6 +70,16 @@
 
     </div>
 
+    <div class="mb-4">
+        <label class="form-label">Stratégie du deck</label>
+
+        <select class="form-select" [(ngModel)]="selectedStrategy">
+            <option value="aggressive">🔥 Aggressive (attaque rapide)</option>
+            <option value="control">🛡️ Contrôle (défense)</option>
+            <option value="combo">⚙️ Combo (équilibré)</option>
+        </select>
+    </div>
+
     <!-- Boutons -->
     <div class="mt-4 text-center">
         <button class="btn btn-success" (click)="saveDeck()">Enregistrer le deck</button>

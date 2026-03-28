@@ -1,35 +1,37 @@
 import { CollectionItemModel } from "../models/collection.model";
 
+export type DeckStrategy = 'aggressive' | 'control' | 'combo' | 'balanced';
+
 export class DeckFactory {
 
-    static generate(cards: CollectionItemModel[], selectedTypes: string[]) {
+    static generate(
+        cards: CollectionItemModel[],
+        selectedTypes: string[],
+        strategy: DeckStrategy = 'balanced'
+    ) {
 
-        // 🔥 filtrer par types
         const filtered = cards.filter(c => selectedTypes.includes(c.type));
 
-        // 🔥 score (IA simple)
         const scored = filtered.map(card => ({
             card,
-            score: this.calculateScore(card)
+            score: this.calculateScore(card, strategy)
         }));
 
-        // 🔥 tri par score décroissant
+        // 🔥 tri
         scored.sort((a, b) => b.score - a.score);
 
         const deck: { card: CollectionItemModel, quantity: number }[] = [];
 
-        let totalCards = 0;
-        const MAX_DECK = 30;
-        const MAX_PER_CARD = 3;
+        let total = 0;
+        const MAX = 30;
 
         for (const item of scored) {
 
-            const available = item.card.quantity;
-            const maxAdd = Math.min(available, MAX_PER_CARD);
+            const maxAdd = Math.min(item.card.quantity, 3);
 
             for (let i = 0; i < maxAdd; i++) {
 
-                if (totalCards >= MAX_DECK) break;
+                if (total >= MAX) break;
 
                 const existing = deck.find(d => d.card.cardId === item.card.cardId);
 
@@ -39,24 +41,39 @@ export class DeckFactory {
                     deck.push({ card: item.card, quantity: 1 });
                 }
 
-                totalCards++;
+                total++;
             }
 
-            if (totalCards >= MAX_DECK) break;
+            if (total >= MAX) break;
         }
 
         return deck;
     }
 
-    // 🧠 score intelligent
-    private static calculateScore(card: CollectionItemModel): number {
+    // 🧠 SCORE INTELLIGENT SELON STRATÉGIE
+    private static calculateScore(card: CollectionItemModel, strategy: DeckStrategy): number {
 
         const attack = card.attack || 0;
         const defense = card.defense || 0;
         const hp = card.hp || 0;
         const cost = card.energyCost || 1;
 
-        // formule simple (tu peux améliorer)
-        return (attack * 1.5) + defense + hp - (cost * 0.5);
+        // 🔥 AGRO (rapide, attaque)
+        if (strategy === 'aggressive') {
+            return (attack * 2) + (hp * 0.5) - cost;
+        }
+
+        // 🛡️ CONTRÔLE (tank + défense)
+        if (strategy === 'control') {
+            return (hp * 2) + defense - cost;
+        }
+
+        // ⚙️ COMBO (équilibré + coût modéré)
+        if (strategy === 'combo') {
+            return (attack + defense + hp) - (cost * 0.3);
+        }
+
+        // ⚖️ BALANCED (par défaut)
+        return attack + defense + hp - cost;
     }
 }
