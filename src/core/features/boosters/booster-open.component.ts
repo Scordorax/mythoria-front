@@ -5,6 +5,7 @@ import * as THREE from 'three';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserModelService } from '../../services/user.service';
+import { BoosterFactory } from '../../factories/booster.factory';
 
 interface Booster3D {
     renderer: THREE.WebGLRenderer;
@@ -126,15 +127,21 @@ export class BoosterOpenComponent implements AfterViewInit, OnDestroy {
 
     openModal(type: string) {
         this.selectedType = type;
+
         this.boosterService.getAll().subscribe(all => {
-            const boosters = all.filter(b => b.name === type);
+
+            const boosters = BoosterFactory.filterByType(all, type);
+
             this.boostersOfType = [];
+
             while (this.boostersOfType.length < 10) {
                 for (let b of boosters) {
-                    if (this.boostersOfType.length < 10) this.boostersOfType.push(b);
-                    else break;
+                    if (this.boostersOfType.length < 10) {
+                        this.boostersOfType.push(b);
+                    }
                 }
             }
+
             this.centerIndex = 0;
             this.modalInstance.show();
         });
@@ -181,9 +188,8 @@ export class BoosterOpenComponent implements AfterViewInit, OnDestroy {
     }
 
     openSingleBooster(booster: BoosterModel) {
-        // Utilise l'ID réel de l'utilisateur
         this.boosterService.openBooster(this.userId, booster.id).subscribe(res => {
-            alert(`Vous avez ouvert "${booster.name}" et reçu ${res.cardsReceived} cartes !`);
+            alert(`Vous avez reçu ${res.cardsReceived} cartes !`);
             this.modalInstance.hide();
             this.router.navigate(['/collection']);
         });

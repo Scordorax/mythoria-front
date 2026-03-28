@@ -78,14 +78,14 @@ export class BoosterListComponent implements OnInit, AfterViewInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.userService.getCurrentUser().subscribe(user => {
-      this.userId = user.sub;
+  this.userService.getCurrentUser().subscribe(user => {
+    this.userId = user.sub;
 
-      this.boosterService.getAll().subscribe(data => {
-        this.boosters = data;
-      });
+    this.boosterService.getAll().subscribe(data => {
+      this.boosters = data;
     });
-  }
+  });
+}
 
   ngAfterViewInit(): void {
     // Quand les canvases sont rendus, créer le 3D

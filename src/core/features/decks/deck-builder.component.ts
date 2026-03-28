@@ -8,6 +8,7 @@ import { UserModelService } from '../../services/user.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DeckFactory } from '../../factories/deck.factory';
 
 @Component({
     selector: 'app-deck-builder',
@@ -148,6 +149,21 @@ export class DeckBuilderComponent implements OnInit {
             },
             error: err => console.error('Erreur création deck', err)
         });
+    }
+
+    generateAutoDeck(): void {
+
+        if (this.selectedTypes.length === 0) {
+            alert("Choisissez au moins un type");
+            return;
+        }
+
+        this.deckCards = DeckFactory.generate(
+            this.allCards,
+            this.selectedTypes
+        );
+
+        console.log("Deck généré :", this.deckCards);
     }
 
     cancel(): void {
