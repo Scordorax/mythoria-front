@@ -1,14 +1,13 @@
-import { CardModel } from "../models/card.model";
-import { MatchAction } from "../models/match-action.model";
-import { MatchPlayer } from "../models/match-player.model";
 import { Match } from "../models/match.model";
-
+import { MatchPlayer } from "../models/match-player.model";
+import { CardModel } from "../models/card.model";
 
 export class MatchFactory {
 
   static createMatch(data: any): Match {
     return {
       matchId: data.matchId,
+      playerId:data.playerId,
       status: data.status,
       turn: data.turn,
       players: data.players.map((p: any) =>
@@ -19,12 +18,17 @@ export class MatchFactory {
 
   static createPlayer(data: any): MatchPlayer {
     return {
+      userId:data.userId,
       username: data.username,
       lifePoints: data.lifePoints,
       energy: data.energy,
+      deadCards:data.deadCards,
 
       hand: data.hand ? data.hand.map((c: any) => this.createCard(c)) : [],
-      activeCard: data.activeCard ? this.createCard(data.activeCard) : null,
+
+      activeCard: data.activeCards
+        ? data.activeCards.map((c: any) => this.createCard(c))
+        : [],
 
       deckCount: data.deckCount ?? 0,
       discard: data.discard ? data.discard.map((c: any) => this.createCard(c)) : []
@@ -44,44 +48,4 @@ export class MatchFactory {
       energyCost: data.energyCost
     };
   }
-   /**
-   * 🤖 IA : choix de carte
-   */
-  static aiChooseCard(player: MatchPlayer): CardModel | null {
-    if (!player.hand || player.hand.length === 0) return null;
-
-    // Carte avec le plus d'attaque
-    return player.hand.reduce((best, card) =>
-      card.attack > best.attack ? card : best
-    );
-  }
-
-  /**
-   * 🤖 IA : décision d'action
-   */
-  static aiPlayTurn(player: MatchPlayer): MatchAction {
-    const card = this.aiChooseCard(player);
-
-    if (card) {
-      return {
-        type: 'PLAY_CARD',
-        player: player.username,
-        payload: {
-          card: card.name,
-          damage: card.attack
-        },
-        date: new Date().toISOString()
-      };
-    }
-
-    return {
-      type: 'SKIP',
-      player: player.username,
-      payload: {
-        skip: true
-      },
-      date: new Date().toISOString()
-    };
-  }
-
 }

@@ -1,8 +1,9 @@
 import { MatchPlayer } from "./match-player.model";
 
 export interface Match {
-  matchId: number;
+  matchId: any;
+  playerId:any;
   status: string;
-  turn: number;
+  turn: any;
   players: MatchPlayer[];
 }

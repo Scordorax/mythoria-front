@@ -1,69 +1,99 @@
-<div *ngIf="loading" class="loading">
-  Chargement du match...
-</div>
+<div *ngIf="loading">Chargement...</div>
 
-<div *ngIf="!loading && match">
+<div *ngIf="error" class="error">{{ error }}</div>
 
-  <h1>🎮 Match #{{ match.matchId }}</h1>
-  <h2>Tour : {{ match.turn }}</h2>
+<div *ngIf="match && !loading" class="match-container">
 
-  <!-- JEU -->
-  <div class="players">
+    <!-- HEADER -->
+    <div class="header">
+        <h2>⚔️ Match #{{ match.matchId }}</h2>
+        <p>Tour : {{ currentTurn }}</p>
 
-    <!-- 👤 JOUEUR -->
-    <div class="player player-user">
-      <h3>👤 {{ match.players[0].username }}</h3>
-
-      <p>❤️ PV : {{ match.players[0].lifePoints }}</p>
-      <p>⚡ Énergie : {{ match.players[0].energy }}</p>
-
-      <h4>🃏 Main</h4>
-      <div class="cards">
-
-        <div class="card" *ngFor="let card of match.players[0].hand">
-          <p class="card-name">{{ card.name }}</p>
-          <p>⚔️ {{ card.attack }}</p>
-          <p>🛡️ {{ card.defense }}</p>
-          <p>❤️ {{ card.hp }}</p>
-
-          <button (click)="playCard(card.id)">
-            Jouer
-          </button>
-        </div>
-
-      </div>
-
-      <p>📦 Deck restant : {{ match.players[0].deckCount }}</p>
+        <button (click)="drawCard()">🃏 Piocher</button>
+        <button (click)="endTurn()" [disabled]="currentTurn !== 'PLAYER'">
+            Fin de tour
+        </button>
     </div>
 
-    <!-- 🤖 IA -->
-    <div class="player player-ai">
-      <h3>🤖 {{ match.players[1].username }}</h3>
+    <div class="battle-field">
 
-      <p>❤️ PV : {{ match.players[1].lifePoints }}</p>
-      <p>⚡ Énergie : {{ match.players[1].energy }}</p>
+        <!-- JOUEUR -->
+        <div class="player-card">
 
-      <h4>🃏 Main (IA)</h4>
-      <div class="cards">
+            <h3>👤 {{ player?.username }}</h3>
+            <p>❤️ {{ player?.lifePoints }}</p>
 
-        <div class="card ai-card" *ngFor="let card of match.players[1].hand">
-          <p class="card-name">{{ card.name }}</p>
-          <p>⚔️ {{ card.attack }}</p>
-          <p>🛡️ {{ card.defense }}</p>
+            <!-- MAIN -->
+            <h4>Main</h4>
+            <div class="cards">
+                <div *ngFor="let card of player?.hand"
+                     (click)="playCard(card)">
+                    <p>{{ card.name }}</p>
+                    <p>⚔️ {{ card.attack }}</p>
+                    <p>❤️ {{ card.hp }}</p>
+                </div>
+            </div>
+
+            <!-- CARTES ACTIVES -->
+            <h4>🔥 Actives</h4>
+            <div class="cards">
+                <div *ngIf="player?.activeCard as card"
+                     (click)="attackCard(card, opponent!.activeCard)"
+                     [class.attack-animation]="isAttacking">
+                    <p>{{ card.name }}</p>
+                    <p>⚔️ {{ card.attack }}</p>
+                    <p>❤️ {{ card.hp }}</p>
+                </div>
+            </div>
+
+            <!-- CARTES MORTES -->
+            <h4>💀 Cimetière</h4>
+            <div class="cards">
+                <div *ngFor="let card of player?.deadCards" class="dead">
+                    {{ card.name }}
+                </div>
+            </div>
+
         </div>
 
-      </div>
+        <!-- CENTRE -->
+        <div class="center">
+            <h2>⚔️ VS ⚔️</h2>
+        </div>
 
-      <p>📦 Deck restant : {{ match.players[1].deckCount }}</p>
+        <!-- ADVERSAIRE -->
+        <div class="player-card opponent">
+
+            <h3>🤖 {{ opponent?.username }}</h3>
+            <p>❤️ {{ opponent?.lifePoints }}</p>
+
+            <!-- MAIN -->
+            <h4>Main</h4>
+            <div class="cards">
+                <div *ngFor="let card of opponent?.hand">
+                    <div class="card-back">🂠</div>
+                </div>
+            </div>
+
+            <!-- CARTES ACTIVES -->
+            <h4>🔥 Actives</h4>
+            <div class="cards">
+                <div *ngIf="opponent?.activeCard as card">
+                    <p>{{ card.name }}</p>
+                    <p>⚔️ {{ card.attack }}</p>
+                    <p>❤️ {{ card.hp }}</p>
+                </div>
+            </div>
+
+            <!-- CARTES MORTES -->
+            <h4>💀 Cimetière</h4>
+            <div class="cards">
+                <div *ngFor="let card of opponent?.deadCards" class="dead">
+                    {{ card.name }}
+                </div>
+            </div>
+
+        </div>
+
     </div>
-
-  </div>
-
-  <!-- ACTIONS -->
-  <div class="actions">
-    <button class="end-turn" (click)="endTurn()">
-      ⏭️ Fin du tour
-    </button>
-  </div>
-
 </div>

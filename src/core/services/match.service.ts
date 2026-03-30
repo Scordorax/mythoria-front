@@ -2,48 +2,70 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
+import { environment } from '../../environnement/environnement';
 import { Match } from '../models/match.model';
 import { MatchAction } from '../models/match-action.model';
-import { environment } from '../../environnement/environnement';
 import { MatchFactory } from '../factories/match.factory';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class MatchService {
 
-    private apiUrl = `${environment.apiUrl}/match`;
+  private apiUrl = `${environment.apiUrl}/match`;
 
-    constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
-    getMatches(userId: number): Observable<Match[]> {
-        return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`).pipe(
-            map(data => data.map(m => MatchFactory.createMatch(m)))
-        );
-    }
+  // =========================
+  // 📊 GET MATCH
+  // =========================
+  getMatch(matchId: number): Observable<Match> {
+    return this.http.get<any>(`${this.apiUrl}/${matchId}`)
+      .pipe(
+        map(data => MatchFactory.createMatch(data))
+      );
+  }
 
-    createMatch(userId: string, deckId: number): Observable<number> {
-        return this.http.post<any>(`${this.apiUrl}/create/${userId}/${deckId}`, {})
-            .pipe(map(res => res.matchId));
-    }
+  // =========================
+  // 🎮 CREATE MATCH
+  // =========================
+  createMatch(userId: number, deckId: number): Observable<number> {
+    return this.http.post<any>(`${this.apiUrl}/create/${userId}/${deckId}`, {})
+      .pipe(
+        map(res => res.matchId)
+      );
+  }
 
-    getMatch(matchId: number): Observable<Match> {
-        return this.http.get<any>(`${this.apiUrl}/${matchId}`).pipe(
-            map(data => MatchFactory.createMatch(data))
-        );
-    }
+  // =========================
+  // 🃏 DRAW CARD
+  // =========================
+  drawCard(matchId: number,userId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${matchId}/draw-card`, {
+      userId: userId,
+    });
+  }
 
-    playCard(matchId: number, cardId: number): Observable<any> {
-        return this.http.post(`${this.apiUrl}/${matchId}/play-card`, {
-            cardId: cardId
-        });
-    }
+  // =========================
+  // 🃏 PLAY CARD
+  // =========================
+  playCard(matchId: number, userId: number, cardId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/${matchId}/play-card`, {
+      userId: userId, 
+      cardId: cardId
+    });
+  }
 
-    getActions(matchId: number): Observable<MatchAction[]> {
-        return this.http.get<MatchAction[]>(`${this.apiUrl}/${matchId}/actions`);
-    }
+  // =========================
+  // 📜 GET ACTIONS (si backend OK)
+  // =========================
+  getActions(matchId: number): Observable<MatchAction[]> {
+    return this.http.get<MatchAction[]>(`${this.apiUrl}/${matchId}/actions`);
+  }
 
-    endMatch(matchId: number): Observable<any> {
-        return this.http.post(`${this.apiUrl}/${matchId}/end`, {});
-    }
+  // =========================
+  // 🏁 END MATCH (optionnel)
+  // =========================
+  endMatch(matchId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${matchId}/end`, {});
+  }
 }
