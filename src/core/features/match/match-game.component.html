@@ -1,96 +1,136 @@
-<div *ngIf="loading">Chargement...</div>
+<div *ngIf="loading" style="color:white; padding:20px">Chargement...</div>
 
 <div *ngIf="error" class="error">{{ error }}</div>
+
+<!-- END GAME OVERLAY -->
+<div *ngIf="isFinished && match">
+    <!-- DEFEAT -->
+    <div *ngIf="playerLost && !opponentLost" class="end-screen defeat">
+        <h1>💀 DÉFAITE</h1>
+        <p>Toutes vos cartes sont tombées ou vos PV sont à zéro.</p>
+    </div>
+    <!-- VICTORY -->
+    <div *ngIf="opponentLost && !playerLost" class="end-screen victory">
+        <h1>🏆 VICTOIRE !</h1>
+        <p>L'IA n'a plus de cartes ni de PV !</p>
+    </div>
+    <!-- DRAW -->
+    <div *ngIf="playerLost && opponentLost" class="end-screen draw">
+        <h1>🤝 ÉGALITÉ</h1>
+        <p>Les deux joueurs ont perdu en même temps.</p>
+    </div>
+</div>
 
 <div *ngIf="match && !loading" class="match-container">
 
     <!-- HEADER -->
     <div class="header">
-        <h2>⚔️ Match #{{ match.matchId }}</h2>
-        <p>Tour : {{ currentTurn }}</p>
-
-        <button (click)="drawCard()">🃏 Piocher</button>
-        <button (click)="endTurn()" [disabled]="currentTurn !== 'PLAYER'">
-            Fin de tour
+        <h2 style="margin:0">⚔️ Match #{{ match.matchId }}</h2>
+        <button class="draw-btn" (click)="drawCard()" [disabled]="isFinished">
+            🃏 Piocher
         </button>
+        <span style="color:#94a3b8; font-size:13px">
+            Tour {{ match.turn }}
+        </span>
     </div>
 
     <div class="battle-field">
 
-        <!-- JOUEUR -->
+        <!-- ===== JOUEUR ===== -->
         <div class="player-card">
 
             <h3>👤 {{ player?.username }}</h3>
-            <p>❤️ {{ player?.lifePoints }}</p>
+            <p>❤️ <strong>{{ player?.lifePoints }}</strong> PV &nbsp;|&nbsp; ⚡ Énergie : {{ player?.energy }}</p>
+
+            <!-- CARTE ACTIVE -->
+            <h4>🔥 Carte active</h4>
+            <div class="active-zone">
+
+                <div *ngIf="activeDisplay; else emptyActive"
+                     class="card active-card">
+                    <p><strong>{{ activeDisplay.name }}</strong></p>
+                    <p>⚔️ Attaque : {{ activeDisplay.attack }}</p>
+                    <p>🛡️ Défense : {{ activeDisplay.defense }}</p>
+                    <p>❤️ PV : {{ activeDisplay.hp }}</p>
+                    <p>⚡ Coût : {{ activeDisplay.energyCost }}</p>
+                </div>
+                <ng-template #emptyActive>
+                    <div class="empty-slot">Pas de carte active</div>
+                </ng-template>
+
+                <!-- Bouton attaque — apparaît quand une carte est sélectionnée -->
+                <button *ngIf="selectedCard && !isFinished"
+                        class="attack-btn"
+                        (click)="attack()">
+                    ⚔️ Attaquer !
+                </button>
+
+            </div>
 
             <!-- MAIN -->
-            <h4>Main</h4>
+            <h4>🃏 Main ({{ player?.hand?.length ?? 0 }} cartes) — clique pour sélectionner</h4>
             <div class="cards">
                 <div *ngFor="let card of player?.hand"
-                     (click)="playCard(card)">
-                    <p>{{ card.name }}</p>
+                     class="card"
+                     [class.selected]="selectedCard?.id === card.id"
+                     (click)="selectCard(card)">
+                    <p><strong>{{ card.name }}</strong></p>
                     <p>⚔️ {{ card.attack }}</p>
+                    <p>🛡️ {{ card.defense }}</p>
                     <p>❤️ {{ card.hp }}</p>
+                    <p>⚡ {{ card.energyCost }}</p>
                 </div>
             </div>
 
-            <!-- CARTES ACTIVES -->
-            <h4>🔥 Actives</h4>
+            <!-- CIMETIÈRE -->
+            <h4>💀 Cimetière <span class="dead-badge">{{ player?.deadCards?.length ?? 0 }} carte(s)</span></h4>
             <div class="cards">
-                <div *ngIf="player?.activeCard as card"
-                     (click)="attackCard(card, opponent!.activeCard)"
-                     [class.attack-animation]="isAttacking">
-                    <p>{{ card.name }}</p>
-                    <p>⚔️ {{ card.attack }}</p>
-                    <p>❤️ {{ card.hp }}</p>
+                <div *ngFor="let card of player?.deadCards" class="card dead">
+                    <p><strong>{{ card.name }}</strong></p>
+                    <p>⚔️ {{ card.attack }} / 🛡️ {{ card.defense }}</p>
                 </div>
-            </div>
-
-            <!-- CARTES MORTES -->
-            <h4>💀 Cimetière</h4>
-            <div class="cards">
-                <div *ngFor="let card of player?.deadCards" class="dead">
-                    {{ card.name }}
-                </div>
+                <div *ngIf="!player?.deadCards?.length" style="color:#475569; font-size:12px">Aucune carte éliminée</div>
             </div>
 
         </div>
 
-        <!-- CENTRE -->
-        <div class="center">
-            <h2>⚔️ VS ⚔️</h2>
-        </div>
+        <!-- ===== CENTRE ===== -->
+        <div class="center">VS</div>
 
-        <!-- ADVERSAIRE -->
+        <!-- ===== ADVERSAIRE (IA) ===== -->
         <div class="player-card opponent">
 
             <h3>🤖 {{ opponent?.username }}</h3>
-            <p>❤️ {{ opponent?.lifePoints }}</p>
+            <p>❤️ <strong>{{ opponent?.lifePoints }}</strong> PV</p>
 
-            <!-- MAIN -->
-            <h4>Main</h4>
-            <div class="cards">
-                <div *ngFor="let card of opponent?.hand">
-                    <div class="card-back">🂠</div>
+            <!-- CARTE ACTIVE IA -->
+            <h4>🔥 Carte active</h4>
+            <div class="active-zone">
+                <div *ngIf="opponent?.activeCard; else emptyAiActive" class="card">
+                    <p><strong>{{ opponent?.activeCard?.name }}</strong></p>
+                    <p>⚔️ {{ opponent?.activeCard?.attack }}</p>
+                    <p>🛡️ {{ opponent?.activeCard?.defense }}</p>
+                    <p>❤️ {{ opponent?.activeCard?.hp }}</p>
                 </div>
+                <ng-template #emptyAiActive>
+                    <div class="empty-slot">Pas de carte active</div>
+                </ng-template>
             </div>
 
-            <!-- CARTES ACTIVES -->
-            <h4>🔥 Actives</h4>
+            <!-- MAIN IA (face cachée) -->
+            <h4>🃏 Main ({{ opponent?.hand?.length ?? 0 }} cartes)</h4>
             <div class="cards">
-                <div *ngIf="opponent?.activeCard as card">
-                    <p>{{ card.name }}</p>
-                    <p>⚔️ {{ card.attack }}</p>
-                    <p>❤️ {{ card.hp }}</p>
-                </div>
+                <div *ngFor="let _ of opponent?.hand" class="card-back">🂠</div>
             </div>
 
-            <!-- CARTES MORTES -->
-            <h4>💀 Cimetière</h4>
+            <!-- CIMETIÈRE IA -->
+            <h4>💀 Cimetière <span class="dead-badge">{{ opponent?.deadCards?.length ?? 0 }} carte(s)</span></h4>
             <div class="cards">
-                <div *ngFor="let card of opponent?.deadCards" class="dead">
-                    {{ card.name }}
+                <div *ngFor="let card of opponent?.deadCards" class="card dead">
+                    <p><strong>{{ card.name }}</strong></p>
+                    <p>⚔️ {{ card.attack }} / 🛡️ {{ card.defense }}</p>
                 </div>
+                <div *ngIf="!opponent?.deadCards?.length" style="color:#475569; font-size:12px">Aucune carte éliminée</div>
             </div>
 
         </div>

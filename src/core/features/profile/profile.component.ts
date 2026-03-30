@@ -16,7 +16,7 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TruncatePipe],
+  imports: [CommonModule],
   templateUrl: './profile.component.html',
   styles: [`
     .profile-container {

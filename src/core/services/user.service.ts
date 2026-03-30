@@ -21,7 +21,7 @@ export class UserModelService {
      Récupérer l'utilisateur courant
   ========================== */
   getCurrentUser(): Observable<UserModel> {
-    const token = localStorage.getItem('jwt');
+    const token = localStorage.getItem('token');
     return this.http.get<UserModel>(`${this.apiUrl}/me`, {
       headers: { Authorization: `Bearer ${token}` }
     }).pipe(

@@ -22,13 +22,13 @@ export class MatchFactory {
       username: data.username,
       lifePoints: data.lifePoints,
       energy: data.energy,
-      deadCards:data.deadCards,
+      deadCards: data.deadCards ? data.deadCards.map((c: any) => this.createCard(c)) : [],
 
       hand: data.hand ? data.hand.map((c: any) => this.createCard(c)) : [],
 
-      activeCard: data.activeCards
-        ? data.activeCards.map((c: any) => this.createCard(c))
-        : [],
+      activeCard: data.activeCards && data.activeCards.length > 0
+        ? this.createCard(data.activeCards[0])
+        : null,
 
       deckCount: data.deckCount ?? 0,
       discard: data.discard ? data.discard.map((c: any) => this.createCard(c)) : []
