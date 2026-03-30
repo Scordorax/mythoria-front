@@ -60,6 +60,7 @@ export class SidebarComponent {
     { label: 'Decks', link: '/decks', icon: 'bi bi-stack' },
     { label: 'Boosters', link: '/dashboard', icon: 'bi bi-box' },
     { label: 'Collection', link: '/collection', icon: 'bi bi-folder' },
-    { label: 'Profile', link: '/profile', icon: 'bi bi-person-fill' }
+    { label: 'Profile', link: '/profile', icon: 'bi bi-person-fill' },
+    { label: 'Match', link: '/match-lobby', icon: 'bi bi-lightning-fill' }
   ];
 }

@@ -11,6 +11,9 @@ import { DeckBuilderComponent } from '../core/features/decks/deck-builder.compon
 import { DeckDetailComponent } from '../core/features/decks/deck-detail.component';
 import { DeckModifyComponent } from '../core/features/decks/deck-modify.component';
 import { CardFactoryComponent } from '../core/features/cards/card-factory.component';
+import { MatchFactory } from '../core/factories/match.factory';
+import { MatchLobbyComponent } from '../core/features/match/match-lobby.component';
+import { MatchGameComponent } from '../core/features/match/match-game.component';
 
 export const routes: Routes = [
 
@@ -26,6 +29,10 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [authGuard] },
 
   { path: 'cards/factory', component: CardFactoryComponent, canActivate: [authGuard] },
+
+  { path: 'match-lobby', component: MatchLobbyComponent, canActivate: [authGuard] },
+
+  { path: 'match-game/:id', component: MatchGameComponent, canActivate: [authGuard] },
 
   // Routes Deck
   {
